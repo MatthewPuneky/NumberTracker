@@ -1,6 +1,10 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
+using FluentValidation;
 using MediatR;
+using NumberTracker.Core.Common;
 using NumberTracker.Core.Data;
 using NumberTracker.Core.Data.Entities;
 using NumberTracker.Core.Dtos.Categories;
@@ -23,21 +27,26 @@ namespace NumberTracker.Core.Features.Categories
 
         public async Task<CategoryGetDto> Handle(CreateCategoryRequest request, CancellationToken cancellationToken)
         {
-            var categoryToAdd = new Category
-            {
-                Name = request.Name
-            };
+            var category = Mapper.Map<Category>(request);
 
-            _context.Categories.Add(categoryToAdd);
+            _context.Set<Category>().Add(category);
             _context.SaveChanges();
 
-            var categoryToReturn = new CategoryGetDto
-            {
-                Id = categoryToAdd.Id,
-                Name = categoryToAdd.Name
-            };
+            return Mapper.Map<CategoryGetDto>(category);
+        }
+    }
 
-            return categoryToReturn;
+    public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRequest>
+    {
+        public CreateCategoryRequestValidator(
+            IDataContext context)
+        {
+            RuleFor(x => x.Name)
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotNull()
+                .NotEmpty()
+                .Must(name => context.Set<Category>().Any(category => category.Name == name))
+                .WithMessage(ErrorMessages.Categories.NameAlreadyExists);
         }
     }
 }
