@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
+using Newtonsoft.Json;
 using NumberTracker.Core.Common;
 using NumberTracker.Core.Data;
 using NumberTracker.Core.Data.Entities;
@@ -11,12 +12,16 @@ using NumberTracker.Core.Dtos.Categories;
 
 namespace NumberTracker.Core.Features.Categories
 {
-    public class CreateCategoryRequest : IRequest<CategoryGetDto>
+    public class CreateCategoryRequest 
+        : IRequest<CategoryGetDto>
     {
+        [JsonIgnore]
+        public int UserId { get; set; }
         public string Name { get; set; }
     }
 
-    public class CreateCategoryRequestHandler : IRequestHandler<CreateCategoryRequest, CategoryGetDto>
+    public class CreateCategoryRequestHandler 
+        : IRequestHandler<CreateCategoryRequest, CategoryGetDto>
     {
         private readonly IDataContext _context;
 
@@ -25,7 +30,9 @@ namespace NumberTracker.Core.Features.Categories
             _context = context;
         }
 
-        public async Task<CategoryGetDto> Handle(CreateCategoryRequest request, CancellationToken cancellationToken)
+        public async Task<CategoryGetDto> Handle(
+            CreateCategoryRequest request, 
+            CancellationToken cancellationToken)
         {
             var category = Mapper.Map<Category>(request);
 
@@ -36,13 +43,17 @@ namespace NumberTracker.Core.Features.Categories
         }
     }
 
-    public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRequest>
+    public class CreateCategoryRequestValidator 
+        : AbstractValidator<CreateCategoryRequest>
     {
         public CreateCategoryRequestValidator(
             IDataContext context)
         {
+            RuleFor(x => x.UserId)
+                .Must(userId => context.Set<User>().Any(x => userId == x.Id))
+                .WithMessage(ErrorMessages.Users.UserDoesNotExist);
+
             RuleFor(x => x.Name)
-                .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotNull()
                 .NotEmpty()
                 .Must(name => context.Set<Category>().Any(category => category.Name == name))

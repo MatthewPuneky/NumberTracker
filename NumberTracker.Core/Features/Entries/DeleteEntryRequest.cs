@@ -10,47 +10,48 @@ using NumberTracker.Core.Data;
 using NumberTracker.Core.Data.Entities;
 using NumberTracker.Core.Data.Interfaces;
 
-namespace NumberTracker.Core.Features.Categories
+namespace NumberTracker.Core.Features.Entries
 {
-    public class DeleteCategoryRequest 
+    public class DeleteEntryRequest 
         : IRequest, IId
     {
         [JsonIgnore]
         public int Id { get; set; }
     }
 
-    public class DeleteCategoryRequestHandler 
-        : IRequestHandler<DeleteCategoryRequest>
+    public class DeleteEntryRequestHandler 
+        : IRequestHandler<DeleteEntryRequest>
     {
         private readonly IDataContext _context;
 
-        public DeleteCategoryRequestHandler(IDataContext context)
+        public DeleteEntryRequestHandler(
+            IDataContext context)
         {
             _context = context;
         }
 
         public async Task<Unit> Handle(
-            DeleteCategoryRequest request, 
+            DeleteEntryRequest request, 
             CancellationToken cancellationToken)
         {
-            var category = _context.Set<Category>().Find(request.Id);
+            var entry = _context.Set<Entry>().Find(request.Id);
 
-            _context.Set<Category>().Remove(category);
+            _context.Set<Entry>().Remove(entry);
             _context.SaveChanges();
 
             return new Unit();
         }
     }
 
-    public class DeleteCategoryRequestValidator 
-        : AbstractValidator<DeleteCategoryRequest>
+    public class DeleteEntryRequestValidator 
+        : AbstractValidator<DeleteEntryRequest>
     {
-        public DeleteCategoryRequestValidator(
+        public DeleteEntryRequestValidator(
             IDataContext context)
         {
             RuleFor(x => x.Id)
-                .Must(id => context.Set<Category>().Any(x => id == x.Id))
-                .WithMessage(ErrorMessages.Categories.CategoryDoesNotExist);
+                .Must(id => context.Set<Entry>().Any(x => id == x.Id))
+                .WithMessage(ErrorMessages.Entries.EntryDoesNotExist);
         }
     }
 }

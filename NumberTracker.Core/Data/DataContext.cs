@@ -23,5 +23,6 @@ namespace NumberTracker.Core.Data
         }
 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Entry> Entries { get; set; }
     }
 }

@@ -9,11 +9,13 @@ using Newtonsoft.Json;
 using NumberTracker.Core.Common;
 using NumberTracker.Core.Data;
 using NumberTracker.Core.Data.Entities;
+using NumberTracker.Core.Data.Interfaces;
 using NumberTracker.Core.Dtos.Categories;
 
 namespace NumberTracker.Core.Features.Categories
 {
-    public class GetCategoryRequest : IRequest<CategoryGetDto>
+    public class GetCategoryRequest 
+        : IRequest<CategoryGetDto>, IId
     {
         [JsonIgnore]
         public int Id { get; set; }
@@ -24,7 +26,8 @@ namespace NumberTracker.Core.Features.Categories
     {
         private readonly IDataContext _context;
 
-        public GetCategoryRequestHandler(IDataContext context)
+        public GetCategoryRequestHandler(
+            IDataContext context)
         {
             _context = context;
         }
@@ -38,7 +41,8 @@ namespace NumberTracker.Core.Features.Categories
         }
     }
 
-    public class GetCategoryRequestValidator : AbstractValidator<GetCategoryRequest>
+    public class GetCategoryRequestValidator 
+        : AbstractValidator<GetCategoryRequest>
     {
         public GetCategoryRequestValidator(
             IDataContext context)

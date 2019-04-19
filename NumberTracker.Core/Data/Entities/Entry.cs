@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NumberTracker.Core.Data.Interfaces;
 
 namespace NumberTracker.Core.Data.Entities
 {
-    public class Category : IEntity
+    public class Entry : IEntity
     {
         public int Id { get; set; }
+
+        public Category Category { get; set; }
+        public int CategoryId { get; set; }
 
         public User User { get; set; }
         public int UserId { get; set; }
 
-        public string Name { get; set; }
-
-        public List<Entry> Entries { get; set; }
+        public decimal Value { get; set; }
+        public string Memo { get; set; }
     }
 }

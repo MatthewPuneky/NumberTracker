@@ -18,6 +18,10 @@
     <Folder Include="Helpers\" />
     <Folder Include="Helpers\AbstractValidator\" />
     <Folder Include="Data\Interfaces\" />
+    <Folder Include="Features\Entries\" />
+    <Folder Include="Dtos\Entries\" />
+    <Folder Include="Features\Users\" />
+    <Folder Include="Dtos\Users\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

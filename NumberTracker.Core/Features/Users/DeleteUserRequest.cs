@@ -10,47 +10,47 @@ using NumberTracker.Core.Data;
 using NumberTracker.Core.Data.Entities;
 using NumberTracker.Core.Data.Interfaces;
 
-namespace NumberTracker.Core.Features.Categories
+namespace NumberTracker.Core.Features.Users
 {
-    public class DeleteCategoryRequest 
+    public class DeleteUserRequest 
         : IRequest, IId
     {
         [JsonIgnore]
         public int Id { get; set; }
     }
 
-    public class DeleteCategoryRequestHandler 
-        : IRequestHandler<DeleteCategoryRequest>
+    public class DeleteUserRequestHandler 
+        : IRequestHandler<DeleteUserRequest>
     {
         private readonly IDataContext _context;
 
-        public DeleteCategoryRequestHandler(IDataContext context)
+        public DeleteUserRequestHandler(IDataContext context)
         {
             _context = context;
         }
 
         public async Task<Unit> Handle(
-            DeleteCategoryRequest request, 
+            DeleteUserRequest request, 
             CancellationToken cancellationToken)
         {
-            var category = _context.Set<Category>().Find(request.Id);
+            var user = _context.Set<User>().Find(request.Id);
 
-            _context.Set<Category>().Remove(category);
+            _context.Set<User>().Remove(user);
             _context.SaveChanges();
 
             return new Unit();
         }
     }
 
-    public class DeleteCategoryRequestValidator 
-        : AbstractValidator<DeleteCategoryRequest>
+    public class DeleteUserRequestValidator 
+        : AbstractValidator<DeleteUserRequest>
     {
-        public DeleteCategoryRequestValidator(
+        public DeleteUserRequestValidator(
             IDataContext context)
         {
             RuleFor(x => x.Id)
-                .Must(id => context.Set<Category>().Any(x => id == x.Id))
-                .WithMessage(ErrorMessages.Categories.CategoryDoesNotExist);
+                .Must(id => context.Set<User>().Any(x => id == x.Id))
+                .WithMessage(ErrorMessages.Users.UserDoesNotExist);
         }
     }
 }

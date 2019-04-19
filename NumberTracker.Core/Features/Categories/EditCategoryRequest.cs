@@ -14,23 +14,28 @@ using NumberTracker.Core.Dtos.Categories;
 
 namespace NumberTracker.Core.Features.Categories
 {
-    public class EditCategoryRequest : IRequest<CategoryGetDto>, IId
+    public class EditCategoryRequest 
+        : IRequest<CategoryGetDto>, IId
     {
         [JsonIgnore]
         public int Id { get; set; }
         public string Name { get; set; }
     }
 
-    public class EditCategoryRequestHandler : IRequestHandler<EditCategoryRequest, CategoryGetDto>
+    public class EditCategoryRequestHandler 
+        : IRequestHandler<EditCategoryRequest, CategoryGetDto>
     {
         private readonly IDataContext _context;
 
-        public EditCategoryRequestHandler(IDataContext context)
+        public EditCategoryRequestHandler(
+            IDataContext context)
         {
             _context = context;
         }
 
-        public async Task<CategoryGetDto> Handle(EditCategoryRequest request, CancellationToken cancellationToken)
+        public async Task<CategoryGetDto> Handle(
+            EditCategoryRequest request, 
+            CancellationToken cancellationToken)
         {
             var category = _context.Set<Category>().Find(request.Id);
 
@@ -41,18 +46,23 @@ namespace NumberTracker.Core.Features.Categories
         }
     }
 
-    public class EditCategoryRequestValidator : AbstractValidator<EditCategoryRequest>
+    public class EditCategoryRequestValidator 
+        : AbstractValidator<EditCategoryRequest>
     {
-        public EditCategoryRequestValidator(IDataContext context)
+        public EditCategoryRequestValidator(
+            IDataContext context)
         {
+            RuleFor(x => x.Id)
+                .Must(id => context.Set<Category>().Any(x => id == x.Id))
+                .WithMessage(ErrorMessages.Categories.CategoryDoesNotExist);
+
             RuleFor(x => x.Name)
-                .Cascade(CascadeMode.StopOnFirstFailure)
                 .NotNull()
                 .NotEmpty()
                 .DependentRules(() =>
                 {
                     RuleFor(x => x)
-                        .Must(x => context.Set<Category>().Any(y => x.Id == y.Id && x.Name == y.Name))
+                        .Must(x => context.Set<Category>().Any(y => x.Id != y.Id && x.Name == y.Name))
                         .WithMessage(ErrorMessages.Categories.NameAlreadyExists)
                         .WithName(nameof(EditCategoryRequest.Name));
                 });
